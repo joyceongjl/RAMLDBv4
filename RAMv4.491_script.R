@@ -171,7 +171,7 @@ rowMed<-matrixStats::rowMedians(ioe.tb.50yr.mat, na.rm = TRUE)
 ioe.tb.50yr.mat2<-apply(ioe.tb.50yr.mat, 1, function (x) {
   ifelse(is.na(x), median(x, na.rm=T), x)
 })
-ioe.tb.50yr.mat2<-t(ioe.tb.50yr.mat2)#worked
+ioe.tb.50yr.mat2<-t(ioe.tb.50yr.mat2)#worked, 8 stocks from 1965-2014
 
 
 ##subsetting biomass data for ANE (27)
@@ -190,15 +190,28 @@ anerowMed<-matrixStats::rowMedians(ane.tb.53yr.mat, na.rm = TRUE)
 ane.tb.53yr.mat2<-apply(ane.tb.53yr.mat, 1, function (x) {
   ifelse(is.na(x), median(x, na.rm=T), x)
 })
-ane.tb.53yr.mat2<-t(ane.tb.53yr.mat2)#worked
+ane.tb.53yr.mat2<-t(ane.tb.53yr.mat2)#worked, 37 stocks from 1965-2017
 
 
 ##subsetting biomass data for PWC (71)
 pwc.tb.69ts<-tb.69tsfaosp %>% filter(primary_FAOarea=="71")#only 4 stocks (3 tuna, 1 marlin species) with biomass time series
+#could do 1966-2015, 50yr timeseries.
+colnames(pwc.tb.69ts)
+pwc.tb.50yr<-pwc.tb.69ts[,c(17:66,70)]
+rownames(pwc.tb.50yr)<-pwc.tb.50yr[,51]
+pwc.tb.50yr.mat<-as.matrix(pwc.tb.50yr[,1:50])
+
+#have row Medians somewhere to check
+pwcrowMed<-matrixStats::rowMedians(pwc.tb.50yr.mat, na.rm = TRUE)
+pwc.tb.50yr.mat2<-apply(pwc.tb.50yr.mat, 1, function (x) {
+  ifelse(is.na(x), median(x, na.rm=T), x)
+})
+pwc.tb.50yr.mat2<-t(pwc.tb.50yr.mat2)#worked, 4 stocks from 1966-2015
 
 
 #other timeseries I want
 str(tcbest.data)#perhaps only to show that the catches within these regions are also coherent?
-str(f.data)
-str(er.data)
-str(effort.data)
+str(f.data)#218 (1800-2017) obs of 478 vars/stocks
+str(er.data)#147 obs (1872-2018) of 745 vars/stocks
+str(effort.data)# 70 obs (1948-2017) of 29 stocks
+#limit all fishing effort timeseries to 1950 onwards, then combine? perhaps combine measure to stockid
