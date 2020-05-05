@@ -220,3 +220,62 @@ str(f.data)#218 (1800-2017) obs of 478 vars/stocks
 str(er.data)#147 obs (1872-2018) of 745 vars/stocks
 str(effort.data)# 70 obs (1948-2017) of 29 stocks
 #limit all fishing effort timeseries to 1950 onwards, then combine? perhaps combine measure to stockid
+
+#####f.data timeseries
+rownames(f.data)# 1948-2017 [149:218,]
+f1948.2017<-f.data[149:218,]
+str(f1948.2017)#70 obs/years of 478 stocks
+#remove columns that are entirely NAs
+length(which(colSums(is.na(f1948.2017)) < 36))#only 120 stocks have <21 NAs, 146 <26 NAs,  184 stocks < 31 NAs, 255 stocks < 36 NAs
+#Perhaps keep it to 255 stocks first that have <50% NAs.
+f1948.2017sub<-f1948.2017[,colSums(is.na(f1948.2017)) < 36]#70 obs/yrs of 255 vars/stocks. 
+
+str(stk_fao_sp_key)
+
+f.70yr<-as.data.frame(t(f1948.2017sub))
+f.70yr$stockid<-rownames(f.70yr)
+#left join with key to get fao regions and sp names
+f.70yrfaosp<-f.70yr %>% left_join(stk_fao_sp_key, by="stockid")
+length(which(is.na(f.70yrfaosp$primary_FAOarea)))#no NAs
+str(f.70yrfaosp)
+f.70yrfaosp$fao_sp<-paste(f.70yrfaosp$primary_FAOarea,f.70yrfaosp$scientificname,"fdat",sep="_")
+f.70yrfaosp$stock_dat<-paste(f.70yrfaosp$stockid,"fdat",sep="_")
+write.csv(f.70yrfaosp, "fdat_fao_sp_1948-2017.csv")
+
+#####er.data timeseries
+rownames(er.data)# 1948-2017 [77:146,]
+er1948.2017<-er.data[77:146,]
+str(er1948.2017)#70 obs/years of 745 stocks
+#remove columns that are entirely NAs
+length(which(colSums(is.na(er1948.2017)) < 21))#185 stocks have <21 NAs, 231 <26 NAs,  276 stocks < 31 NAs, 381 stocks < 36 NAs
+#Perhaps keep it to 381 stocks first that have <50% NAs.
+er1948.2017sub<-er1948.2017[,colSums(is.na(er1948.2017)) < 36]#70 obs/yrs of 381 vars/stocks. 
+
+str(stk_fao_sp_key)
+
+er.70yr<-as.data.frame(t(er1948.2017sub))
+er.70yr$stockid<-rownames(er.70yr)
+#left join with key to get fao regions and sp names
+er.70yrfaosp<-er.70yr %>% left_join(stk_fao_sp_key, by="stockid")
+length(which(is.na(er.70yrfaosp$primary_FAOarea)))#no NAs
+str(er.70yrfaosp)
+er.70yrfaosp$fao_sp<-paste(er.70yrfaosp$primary_FAOarea,er.70yrfaosp$scientificname,"erdat",sep="_")
+er.70yrfaosp$stock_dat<-paste(er.70yrfaosp$stockid,"erdat",sep="_")
+write.csv(er.70yrfaosp, "erdat_fao_sp_1948-2017.csv")
+
+#####effort.data timeseries
+rownames(effort.data)# 1948-2017 [77:146,]
+effort1948.2017<-effort.data #70 obs/years of 29 stocks
+length(which(colSums(is.na(effort1948.2017)) < 36))#1 stocks have <21 NAs, 1 <26 NAs,  1 < 31 NAs, 8 stocks < 36 NAs
+#Perhaps keep it to 8 stocks first that have <50% NAs.
+effort1948.2017sub<-effort1948.2017[,colSums(is.na(effort1948.2017)) < 36]#70 obs/yrs of 8 vars/stocks. 
+
+effort.70yr<-as.data.frame(t(effort1948.2017sub))
+effort.70yr$stockid<-rownames(effort.70yr)
+#left join with key to get fao regions and sp names
+effort.70yrfaosp<-effort.70yr %>% left_join(stk_fao_sp_key, by="stockid")
+effort.70yrfaosp$fao_sp<-paste(effort.70yrfaosp$primary_FAOarea,effort.70yrfaosp$scientificname,"effort",sep="_")
+effort.70yrfaosp$stock_dat<-paste(effort.70yrfaosp$stockid,"effort",sep="_")
+write.csv(effort.70yrfaosp, "effort_fao_sp_1948-2017.csv")
+
+#combine all df of f, er and effort together, should be 8+381+255=644 stocks/rows of 75 variables.
