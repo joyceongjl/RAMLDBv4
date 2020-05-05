@@ -172,7 +172,8 @@ ioe.tb.50yr.mat2<-apply(ioe.tb.50yr.mat, 1, function (x) {
   ifelse(is.na(x), median(x, na.rm=T), x)
 })
 ioe.tb.50yr.mat2<-t(ioe.tb.50yr.mat2)#worked, 8 stocks from 1965-2014
-
+length(which(is.na(ioe.tb.50yr.mat)))#replaced 36 NAs with median of each biomass timeseries
+#total of 400 values, 36 were NAs = 9%
 
 ##subsetting biomass data for ANE (27)
 ane.tb.69ts<-tb.69tsfaosp %>% filter(primary_FAOarea=="27")#37 stocks with biomass time series
@@ -191,6 +192,8 @@ ane.tb.53yr.mat2<-apply(ane.tb.53yr.mat, 1, function (x) {
   ifelse(is.na(x), median(x, na.rm=T), x)
 })
 ane.tb.53yr.mat2<-t(ane.tb.53yr.mat2)#worked, 37 stocks from 1965-2017
+length(which(is.na(ane.tb.53yr.mat)))#replaced 188 NAs with median of each biomass timeseries
+#total of 1961 values, 188 were NAs = 9.6%
 
 
 ##subsetting biomass data for PWC (71)
@@ -207,6 +210,8 @@ pwc.tb.50yr.mat2<-apply(pwc.tb.50yr.mat, 1, function (x) {
   ifelse(is.na(x), median(x, na.rm=T), x)
 })
 pwc.tb.50yr.mat2<-t(pwc.tb.50yr.mat2)#worked, 4 stocks from 1966-2015
+length(which(is.na(pwc.tb.50yr.mat)))#replaced 11 NAs with median of each biomass timeseries
+#total of 200 values, 11 were NAs = 5.5%
 
 
 #other timeseries I want
