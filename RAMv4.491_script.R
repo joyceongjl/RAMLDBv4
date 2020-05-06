@@ -174,6 +174,7 @@ ioe.tb.50yr.mat2<-apply(ioe.tb.50yr.mat, 1, function (x) {
 ioe.tb.50yr.mat2<-t(ioe.tb.50yr.mat2)#worked, 8 stocks from 1965-2014
 length(which(is.na(ioe.tb.50yr.mat)))#replaced 36 NAs with median of each biomass timeseries
 #total of 400 values, 36 were NAs = 9%
+write.csv(ioe.tb.50yr.mat2, "ioe_tb_1965-2014.csv")
 
 ##subsetting biomass data for ANE (27)
 ane.tb.69ts<-tb.69tsfaosp %>% filter(primary_FAOarea=="27")#37 stocks with biomass time series
@@ -194,7 +195,7 @@ ane.tb.53yr.mat2<-apply(ane.tb.53yr.mat, 1, function (x) {
 ane.tb.53yr.mat2<-t(ane.tb.53yr.mat2)#worked, 37 stocks from 1965-2017
 length(which(is.na(ane.tb.53yr.mat)))#replaced 188 NAs with median of each biomass timeseries
 #total of 1961 values, 188 were NAs = 9.6%
-
+write.csv(ane.tb.53yr.mat2, "ane_tb_1965-2017.csv")
 
 ##subsetting biomass data for PWC (71)
 pwc.tb.69ts<-tb.69tsfaosp %>% filter(primary_FAOarea=="71")#only 4 stocks (3 tuna, 1 marlin species) with biomass time series
@@ -212,7 +213,7 @@ pwc.tb.50yr.mat2<-apply(pwc.tb.50yr.mat, 1, function (x) {
 pwc.tb.50yr.mat2<-t(pwc.tb.50yr.mat2)#worked, 4 stocks from 1966-2015
 length(which(is.na(pwc.tb.50yr.mat)))#replaced 11 NAs with median of each biomass timeseries
 #total of 200 values, 11 were NAs = 5.5%
-
+write.csv(pwc.tb.50yr.mat, "pwc_tb_1966-2015.csv")
 
 #other timeseries I want
 str(tcbest.data)#perhaps only to show that the catches within these regions are also coherent?
@@ -279,3 +280,83 @@ effort.70yrfaosp$stock_dat<-paste(effort.70yrfaosp$stockid,"effort",sep="_")
 write.csv(effort.70yrfaosp, "effort_fao_sp_1948-2017.csv")
 
 #combine all df of f, er and effort together, should be 8+381+255=644 stocks/rows of 75 variables.
+str(effort.70yrfaosp)#dataframe
+allf.70yrfaosp<-bind_rows(f.70yrfaosp, er.70yrfaosp, effort.70yrfaosp)
+write.csv(allf.70yrfaosp, "allfishingeffort_fao_sp_1948-2017.csv")
+
+##subsetting all fishing effort data for IOE (57)
+ioe.allf.70yr<-allf.70yrfaosp %>% filter(primary_FAOarea=="57")#12 stocks with fishing effort time series
+#can go up to 2016, consider deleting NZ pink cusk eel, Genypterus blacodes, or just leave it.
+#note that 4 species are repeats, such that there is 1 f.dat ts and 1 er.dat ts.
+unique(ioe.allf.70yr$scientificname)#8 unique species out of the 12 stocks
+#1960-2017 is a 57 yr timeseries. 
+colnames(ioe.allf.70yr)
+ioe.allf.57yr<-ioe.allf.70yr[,c(13:69,75)]
+rownames(ioe.allf.57yr)<-ioe.allf.57yr[,58]
+ioe.allf.57yr.mat<-as.matrix(ioe.allf.57yr[,1:57])
+length(which(is.na(ioe.allf.57yr.mat)))#will replace 68 NAs with median of each fishing effort timeseries
+#total of 684 values, 68 were NAs = 9.9%
+
+#have row Medians somewhere to check
+ioefrowMed<-matrixStats::rowMedians(ioe.allf.57yr.mat, na.rm = TRUE)
+ioe.allf.57yr.mat2<-apply(ioe.allf.57yr.mat, 1, function (x) {
+  ifelse(is.na(x), median(x, na.rm=T), x)
+})
+ioe.allf.57yr.mat2<-t(ioe.allf.57yr.mat2)#worked, 12 stocks from 1960-2016
+write.csv(ioe.allf.57yr.mat2, "ioe_allf_1960-2016.csv")
+
+##subsetting all fishing effort data for ANE (27)
+ane.allf.70yr<-allf.70yrfaosp %>% filter(primary_FAOarea=="27")#105 stocks with fishing effort time series
+#can go up to 2017, try from 1968 to make a 50yr ts
+unique(ane.allf.70yr$scientificname)#26 unique species out of the 105 stocks
+colnames(ane.allf.70yr)
+ane.allf.50yr<-ane.allf.70yr[,c(21:70,75)]
+rownames(ane.allf.50yr)<-ane.allf.50yr[,51]
+ane.allf.50yr.mat<-as.matrix(ane.allf.50yr[,1:50])
+length(which(is.na(ane.allf.50yr.mat)))#will replace 708 NAs with median of each fishing effort timeseries
+#total of 5250 values, 708 were NAs = 13.5%, too high.
+length(which(is.na(ane.allf.50yr.mat[,5:50])))#need to do from 1972-2017, 46yr timeseries
+ane.allf.46yr.mat<-ane.allf.50yr.mat[,5:50]
+length(which(is.na(ane.allf.46yr.mat)))#will replace 465 NAs with median of each fishing effort timeseries
+#total of 4830 values, 465 were NAs = 9.6%
+
+#have row Medians somewhere to check
+anefrowMed<-matrixStats::rowMedians(ane.allf.46yr.mat, na.rm = TRUE)
+ane.allf.46yr.mat2<-apply(ane.allf.46yr.mat, 1, function (x) {
+  ifelse(is.na(x), median(x, na.rm=T), x)
+})
+ane.allf.46yr.mat2<-t(ane.allf.46yr.mat2)#worked, 105 stocks from 1972-2017, 46yr ts
+write.csv(ane.allf.46yr.mat2, "ane_allf_1972-2017.csv")
+
+##subsetting all fishing effort data for PWC (71)
+pwc.allf.70yr<-allf.70yrfaosp %>% filter(primary_FAOarea=="71")#10 stocks with fishing effort time series
+#can go up to 2015, try from 1966 to make a 50yr ts
+unique(pwc.allf.70yr$scientificname)#7 unique species out of the 10 stocks
+colnames(pwc.allf.70yr)
+pwc.allf.50yr<-pwc.allf.70yr[,c(19:68,75)]
+rownames(pwc.allf.50yr)<-pwc.allf.50yr[,51]
+pwc.allf.50yr.mat<-as.matrix(pwc.allf.50yr[,1:50])
+length(which(is.na(pwc.allf.50yr.mat)))#will replace 52 NAs with median of each fishing effort timeseries
+#total of 500 values, 52 were NAs = 10.4%, too high.
+length(which(is.na(pwc.allf.50yr.mat[,2:50])))#need to do from 1967-2015, 49yr timeseries
+pwc.allf.49yr.mat<-pwc.allf.50yr.mat[,2:50]
+length(which(is.na(pwc.allf.49yr.mat)))#will replace 47 NAs with median of each fishing effort timeseries
+#total of 490 values, 47 were NAs = 9.6%
+
+#have row Medians somewhere to check
+pwxfrowMed<-matrixStats::rowMedians(pwc.allf.49yr.mat, na.rm = TRUE)
+pwc.allf.49yr.mat2<-apply(pwc.allf.49yr.mat, 1, function (x) {
+  ifelse(is.na(x), median(x, na.rm=T), x)
+})
+pwc.allf.49yr.mat2<-t(pwc.allf.49yr.mat2)#worked, 10 stocks from 1967-2015, 49yr ts
+write.csv(pwc.allf.49yr.mat2, "pwc_allf_1967-2015.csv")
+
+##############################################
+###wavelet coherences analyses of biomass and fishing effort timeseries for 3 hotspots
+str(ioe.tb.50yr.mat2)#8 stocks from 1965-2014, 50yr ts
+str(ane.tb.53yr.mat2)#37 stocks from 1965-2017, 53yr ts
+str(pwc.tb.50yr.mat2)#4 stocks from 1966-2015, 50yr ts
+
+str(ioe.allf.57yr.mat2)#12 stocks from 1960-2016, 57yr ts
+str(ane.allf.46yr.mat2)#105 stocks from 1972-2017, 46yr ts
+str(pwc.allf.49yr.mat2)#10 stocks from 1967-2015, 49yr ts
