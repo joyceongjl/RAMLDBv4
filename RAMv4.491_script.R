@@ -358,5 +358,44 @@ str(ane.tb.53yr.mat2)#37 stocks from 1965-2017, 53yr ts
 str(pwc.tb.50yr.mat2)#4 stocks from 1966-2015, 50yr ts
 
 str(ioe.allf.57yr.mat2)#12 stocks from 1960-2016, 57yr ts
+#only 1 stock, BGRDRNSWWA has both f and er ts. manually deleted f.dat
+ioe.allf.57yr.mat3<-ioe.allf.57yr.mat2[-1,]
+#11 stocks from 1960-2016, 57yr ts
 str(ane.allf.46yr.mat2)#105 stocks from 1972-2017, 46yr ts
 str(pwc.allf.49yr.mat2)#10 stocks from 1967-2015, 49yr ts
+#BIGEYECWPAC, SKJCWPAC, YFINCWPAC has f and er, delete f.dat for 3 stocks
+pwc.allf.49yr.mat3<-pwc.allf.49yr.mat2[-c(1,5,6),]
+#7 stocks from 1967-2015, 49yr ts
+
+####From Olaf, ranking is ER, F, Effort. 
+#figure out, for stocks with multiple fishing ts, first use ER, if not than F, and lastly, effort
+#order matrix by rownames
+ane.allf.46yr.mat2.ord<-ane.allf.46yr.mat2[order(rownames(ane.allf.46yr.mat2)),]
+head(ane.allf.46yr.mat2)
+head(ane.allf.46yr.mat2.ord)
+#separate rownames by "_"
+ane.allf.46yr.ord.df<-as.data.frame(ane.allf.46yr.mat2.ord)
+ane.allf.46yr.ord.df$stkid <- sub("_.*", "", rownames(ane.allf.46yr.ord.df))
+ane.allf.46yr.ord.df$dat <- sub(".*_", "", rownames(ane.allf.46yr.ord.df))
+unique(ane.allf.46yr.ord.df$dat)#only er and f dats
+#find the replicate stocks, then delete the f.dat for replicates.
+ane.allf.46yr.ord.df2<-distinct(ane.allf.46yr.ord.df, stkid, .keep_all = T)
+length(which(ane.allf.46yr.ord.df$dat=="fdat"))#48 erdat, 57 fdat
+length(which(ane.allf.46yr.ord.df2$dat=="fdat"))#48 erdat, 11 fdat
+#seems to have worked and taken out the duplicate stocks that are fdat.
+ane.allf.46yr.ord.df2$stk_dat<-paste(ane.allf.46yr.ord.df2$stkid,ane.allf.46yr.ord.df2$dat,sep="_")
+rownames(ane.allf.46yr.ord.df2)<-ane.allf.46yr.ord.df2$stk_dat
+colnames(ane.allf.46yr.ord.df2)
+ane.allf.46yr.mat3<-as.matrix(ane.allf.46yr.ord.df2[,1:46])#should be 59 obs of 46 variables
+str(ane.allf.46yr.mat3)#59 stocks from 1972-2017, 46yr ts
+
+#############################
+#now can start wavelet coh
+###wavelet coherences analyses of biomass and fishing effort timeseries for 3 hotspots
+str(ioe.tb.50yr.mat2)#8 stocks from 1965-2014, 50yr ts
+str(ane.tb.53yr.mat2)#37 stocks from 1965-2017, 53yr ts
+str(pwc.tb.50yr.mat2)#4 stocks from 1966-2015, 50yr ts
+
+str(ioe.allf.57yr.mat3)#11 stocks from 1960-2016, 57yr ts
+str(ane.allf.46yr.mat3)#59 stocks from 1972-2017, 46yr ts
+str(pwc.allf.49yr.mat3)#7 stocks from 1967-2015, 49yr ts
