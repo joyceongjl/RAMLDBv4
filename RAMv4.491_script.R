@@ -399,3 +399,73 @@ str(pwc.tb.50yr.mat2)#4 stocks from 1966-2015, 50yr ts
 str(ioe.allf.57yr.mat3)#11 stocks from 1960-2016, 57yr ts
 str(ane.allf.46yr.mat3)#59 stocks from 1972-2017, 46yr ts
 str(pwc.allf.49yr.mat3)#7 stocks from 1967-2015, 49yr ts
+
+##perhaps do synmat of coh and coh.sig first, then see the number of sig rships betw biomass and F?
+#IOE biomass and fishing mortality coherences
+ioe.tb.50yr.cd<-cleandat(ioe.tb.50yr.mat2, times=1965:2014, clev=5)$cdat
+str(ioe.tb.50yr.cd)
+ioe.tb.coh<-synmat(ioe.tb.50yr.cd, times=1965:2014, method="coh", scale.min=2, scale.max=16)
+rownames(ioe.tb.coh)<-dimnames(ioe.tb.50yr.cd)[[1]]
+colnames(ioe.tb.coh)<-dimnames(ioe.tb.50yr.cd)[[1]]
+ioe.tb.cohsig<-synmat(ioe.tb.50yr.cd, times=1965:2014, method="coh.sig.fast", scale.min=2, scale.max=16, nsurrogs=1000)
+ioe.tb.cohpv<-1-ioe.tb.cohsig
+length(which(ioe.tb.cohpv<0.005))#10 are p<0.05, 7 are p<0.01, 7 are p<0.005
+ioe.tb.cohqv<-ioe.tb.cohpv
+ioe.tb.cohqv[lower.tri(ioe.tb.cohqv)]<-p.adjust(ioe.tb.cohqv[lower.tri(ioe.tb.cohqv)], method="fdr")
+ioe.tb.cohqv[1:5,1:5]#check
+ioe.tb.cohqv.utri<-ioe.tb.cohqv
+ioe.tb.cohqv.utri[upper.tri(ioe.tb.cohqv.utri)]<-NA
+ioe.tb.cohqv.utri<-t(ioe.tb.cohqv.utri)
+ioe.tb.cohqv[upper.tri(ioe.tb.cohqv)]<-ioe.tb.cohqv.utri[upper.tri(ioe.tb.cohqv.utri)]
+ioe.tb.cohqv[1:5,1:5]#check
+length(which(ioe.tb.cohqv<0.10))#16 are less than 20% fdr, 14 < 15% fdr, 6 < 10% fdr
+length(which(!is.na(ioe.tb.cohqv)))#56 not NAs, ie. 28 possible combinations
+#with fdr<20%, 16 out of the 28 (57.14%) pairwise rships were significantly coherent across all timescales.
+
+ioe.allf.57yr.cd<-cleandat(ioe.allf.57yr.mat3, times=1960:2016, clev=5)$cdat
+str(ioe.allf.57yr.cd)
+ioe.allf.coh<-synmat(ioe.allf.57yr.cd,times=1960:2016, method="coh", 
+                     scale.min=2, scale.max=19)
+rownames(ioe.allf.coh)<-dimnames(ioe.allf.57yr.cd)[[1]]
+colnames(ioe.allf.coh)<-dimnames(ioe.allf.57yr.cd)[[1]]
+ioe.allf.cohsig<-synmat(ioe.allf.57yr.cd, times=1960:2016, method="coh.sig.fast", 
+                      scale.min=2, scale.max=19, nsurrogs=1000)
+ioe.allf.cohpv<-1-ioe.allf.cohsig
+length(which(ioe.allf.cohpv<0.05))#12 are p<0.05, 3 are p<0.01, 2 are p<0.005
+ioe.allf.cohqv<-ioe.allf.cohpv
+ioe.allf.cohqv[lower.tri(ioe.allf.cohqv)]<-p.adjust(ioe.allf.cohqv[lower.tri(ioe.allf.cohqv)], method="fdr")
+ioe.allf.cohqv[1:5,1:5]#check
+ioe.allf.cohqv.utri<-ioe.allf.cohqv
+ioe.allf.cohqv.utri[upper.tri(ioe.allf.cohqv.utri)]<-NA
+ioe.allf.cohqv.utri<-t(ioe.allf.cohqv.utri)
+ioe.allf.cohqv[upper.tri(ioe.allf.cohqv)]<-ioe.allf.cohqv.utri[upper.tri(ioe.allf.cohqv.utri)]
+ioe.allf.cohqv[1:5,1:5]#check
+length(which(ioe.allf.cohqv<0.20))#10 are less than 20% fdr, 3 < 15% fdr, 2 < 10% fdr
+length(which(!is.na(ioe.allf.cohqv)))#110 not NAs, ie. 55 possible combinations
+#with fdr<20%, 10 out of the 55 (18.18%) pairwise rships were significantly coherent across all timescales.
+#similar stocks for both biomass and erdat, tunas, marlins, rock lobsters.
+#so it seems like the coherences in IOE are more likely due to coherences in biomass rather than fishing mortality,
+#due to the higher percentages of significantly coherent rships in biomass (57%) compared to F (18%).
+#how to show this as a figure? Perhaps have a figure showing catch of some species that are coherent, and same species of biomass that are coh?
+#could probably check if BLKMARLINIO, SBT (southern bluefin tuna, thunnus maccoyi), SKJCIO (skipjack, katsuwonus pelamis), rock lobster occur in both sets
+
+#quick plot of biomass timeseries?
+str(ioe.tb.50yr.cd)#8 stocks from 1965-2014
+ioe.tb.df<-as.data.frame(t(ioe.tb.50yr.cd))
+ioe.tb.df$year<-seq(1965,2014,1)
+ioe.tb.df2<-melt(ioe.tb.df, id.vars="year", value.name = "cdat", variable.name = "stkid")
+str(ioe.tb.df2)
+str(stk_sp_key)
+stk_sp_key<-stk_fao_sp_key[,-2]
+ioe.tb.df3<-ioe.tb.df2 %>% left_join(stk_sp_key, by=c("stkid"="stockid"))
+str(ioe.tb.df3)
+ioe.tb.df3$sp<-as.factor(ioe.tb.df3$scientificname)
+unique(ioe.tb.df3$sp)#2 stocks of rock lobsters
+
+ioe.tb.p1<-ggplot(ioe.tb.df3, aes(x=year, y=cdat, color=stkid))
+ioe.tb.p1 + geom_line() + theme_bw() + labs(x="year", y="Transformed index") + 
+  theme(legend.box = "horizontal", legend.position = "bottom") +
+  scale_y_continuous(limits = c(-3.5,3.5)) +  guides(col=guide_legend(ncol=3)) 
+#  scale_color_discrete(name="Species", labels=c("sp1loc1", "sp2loc1"))
+##not so easy to see the coherent timeseries.
+#perhaps focus on SKJCIO, rocklobsterSZ, blue grenadier, SWHITSE?
