@@ -401,7 +401,7 @@ str(ane.allf.46yr.mat3)#59 stocks from 1972-2017, 46yr ts
 str(pwc.allf.49yr.mat3)#7 stocks from 1967-2015, 49yr ts
 
 ##perhaps do synmat of coh and coh.sig first, then see the number of sig rships betw biomass and F?
-#IOE biomass and fishing mortality coherences
+##IOE biomass and fishing mortality coherences
 ioe.tb.50yr.cd<-cleandat(ioe.tb.50yr.mat2, times=1965:2014, clev=5)$cdat
 str(ioe.tb.50yr.cd)
 ioe.tb.coh<-synmat(ioe.tb.50yr.cd, times=1965:2014, method="coh", scale.min=2, scale.max=16)
@@ -469,3 +469,111 @@ ioe.tb.p1 + geom_line() + theme_bw() + labs(x="year", y="Transformed index") +
 #  scale_color_discrete(name="Species", labels=c("sp1loc1", "sp2loc1"))
 ##not so easy to see the coherent timeseries.
 #perhaps focus on SKJCIO, rocklobsterSZ, blue grenadier, SWHITSE?
+
+##ANE biomass and fishing mortality coherences
+str(ane.tb.53yr.mat2)#37 stocks from 1965-2017, 53yr ts
+str(ane.allf.46yr.mat3)#59 stocks from 1972-2017, 46yr ts
+
+ane.tb.53yr.cd<-cleandat(ane.tb.53yr.mat2, times=1965:2017, clev=5)$cdat
+str(ane.tb.53yr.cd)
+ane.tb.coh<-synmat(ane.tb.53yr.cd, times=1965:2017, method="coh", scale.min=2, 
+                   scale.max=17)
+rownames(ane.tb.coh)<-dimnames(ane.tb.53yr.cd)[[1]]
+colnames(ane.tb.coh)<-dimnames(ane.tb.53yr.cd)[[1]]
+str(ane.tb.coh)
+ane.tb.cohsig<-synmat(ane.tb.53yr.cd, times=1965:2017, method="coh.sig.fast", 
+                      scale.min=2, scale.max=17, nsurrogs=1000)
+ane.tb.cohpv<-1-ane.tb.cohsig
+length(which(ane.tb.cohpv<0.05))#102 are p<0.05, 51 are p<0.01, 38 are p<0.005
+ane.tb.cohqv<-ane.tb.cohpv
+ane.tb.cohqv[lower.tri(ane.tb.cohqv)]<-p.adjust(ane.tb.cohqv[lower.tri(ane.tb.cohqv)], method="fdr")
+ane.tb.cohqv[1:5,1:5]#check
+ane.tb.cohqv.utri<-ane.tb.cohqv
+ane.tb.cohqv.utri[upper.tri(ane.tb.cohqv.utri)]<-NA
+ane.tb.cohqv.utri<-t(ane.tb.cohqv.utri)
+ane.tb.cohqv[upper.tri(ane.tb.cohqv)]<-ane.tb.cohqv.utri[upper.tri(ane.tb.cohqv.utri)]
+ane.tb.cohqv[1:5,1:5]#check
+length(which(ane.tb.cohqv<0.20))#64 are less than 20% fdr, 53 < 15% fdr, 41 < 10% fdr
+length(which(!is.na(ane.tb.cohqv)))#1332 not NAs, ie. 666 possible combinations
+#with fdr<20%, 64 out of the 666 (9.61%) pairwise rships were significantly coherent across all timescales.
+
+ane.allf.46yr.cd<-cleandat(ane.allf.46yr.mat3, times=1972:2017, clev=5)$cdat
+str(ane.allf.46yr.cd)
+ane.allf.coh<-synmat(ane.allf.46yr.cd,times=1972:2017, method="coh", 
+                     scale.min=2, scale.max=15)
+rownames(ane.allf.coh)<-dimnames(ane.allf.46yr.cd)[[1]]
+colnames(ane.allf.coh)<-dimnames(ane.allf.46yr.cd)[[1]]
+ane.allf.cohsig<-synmat(ane.allf.46yr.cd, times=1972:2017, method="coh.sig.fast", 
+                        scale.min=2, scale.max=15, nsurrogs=1000)
+ane.allf.cohpv<-1-ane.allf.cohsig
+length(which(ane.allf.cohpv<0.005))#130 are p<0.05, 34 are p<0.01, 22 are p<0.005
+ane.allf.cohqv<-ane.allf.cohpv
+ane.allf.cohqv[lower.tri(ane.allf.cohqv)]<-p.adjust(ane.allf.cohqv[lower.tri(ane.allf.cohqv)], method="fdr")
+ane.allf.cohqv[1:5,1:5]#check
+ane.allf.cohqv.utri<-ane.allf.cohqv
+ane.allf.cohqv.utri[upper.tri(ane.allf.cohqv.utri)]<-NA
+ane.allf.cohqv.utri<-t(ane.allf.cohqv.utri)
+ane.allf.cohqv[upper.tri(ane.allf.cohqv)]<-ane.allf.cohqv.utri[upper.tri(ane.allf.cohqv.utri)]
+ane.allf.cohqv[1:5,1:5]#check
+length(which(ane.allf.cohqv<0.30))#12 are less than 30% fdr, 0 are less than 20% fdr, 0 < 15% fdr, 0 < 10% fdr
+length(which(!is.na(ane.allf.cohqv)))#3422 not NAs, ie. 1711 possible combinations
+#with fdr<20%, 0 out of the 1711 (0%) pairwise combinations were sig.
+
+##PWC biomass and fishing mortality coherences
+str(pwc.tb.50yr.mat2)#4 stocks from 1966-2015, 50yr ts
+str(pwc.allf.49yr.mat3)#7 stocks from 1967-2015, 49yr ts
+
+pwc.tb.50yr.cd<-cleandat(pwc.tb.50yr.mat2, times=1966:2015, clev=5)$cdat
+str(pwc.tb.50yr.cd)
+pwc.tb.coh<-synmat(pwc.tb.50yr.cd, times=1966:2015, method="coh", scale.min=2, 
+                   scale.max=16)
+rownames(pwc.tb.coh)<-dimnames(pwc.tb.50yr.cd)[[1]]
+colnames(pwc.tb.coh)<-dimnames(pwc.tb.50yr.cd)[[1]]
+str(pwc.tb.coh)
+pwc.tb.cohsig<-synmat(pwc.tb.50yr.cd, times=1966:2015, method="coh.sig.fast", 
+                      scale.min=2, scale.max=16, nsurrogs=1000)
+pwc.tb.cohpv<-1-pwc.tb.cohsig
+length(which(pwc.tb.cohpv<0.005))#1 are p<0.05, 0 are p<0.01, 0 are p<0.005
+pwc.tb.cohqv<-pwc.tb.cohpv
+pwc.tb.cohqv[lower.tri(pwc.tb.cohqv)]<-p.adjust(pwc.tb.cohqv[lower.tri(pwc.tb.cohqv)], method="fdr")
+pwc.tb.cohqv[1:4,1:4]#check
+pwc.tb.cohqv.utri<-pwc.tb.cohqv
+pwc.tb.cohqv.utri[upper.tri(pwc.tb.cohqv.utri)]<-NA
+pwc.tb.cohqv.utri<-t(pwc.tb.cohqv.utri)
+pwc.tb.cohqv[upper.tri(pwc.tb.cohqv)]<-pwc.tb.cohqv.utri[upper.tri(pwc.tb.cohqv.utri)]
+pwc.tb.cohqv[1:4,1:4]#check
+length(which(pwc.tb.cohqv<0.20))#2 are less than 20% fdr, 1 < 15% fdr, 0 < 10% fdr
+length(which(!is.na(pwc.tb.cohqv)))#12 not NAs, ie. 6 possible combinations
+#with fdr<20%, 2 out of the 6 (33.33%) pairwise rships were significantly coherent across all timescales.
+
+pwc.allf.49yr.cd<-cleandat(pwc.allf.49yr.mat3, times=1967:2015, clev=5)$cdat
+str(pwc.allf.49yr.cd)
+pwc.allf.coh<-synmat(pwc.allf.49yr.cd,times=1967:2015, method="coh", 
+                     scale.min=2, scale.max=16)
+rownames(pwc.allf.coh)<-dimnames(pwc.allf.49yr.cd)[[1]]
+colnames(pwc.allf.coh)<-dimnames(pwc.allf.49yr.cd)[[1]]
+pwc.allf.cohsig<-synmat(pwc.allf.49yr.cd, times=1967:2015, method="coh.sig.fast", 
+                        scale.min=2, scale.max=16, nsurrogs=1000)
+pwc.allf.cohpv<-1-pwc.allf.cohsig
+length(which(pwc.allf.cohpv<0.005))#6 are p<0.05, 5 are p<0.01, 4 are p<0.005
+pwc.allf.cohqv<-pwc.allf.cohpv
+pwc.allf.cohqv[lower.tri(pwc.allf.cohqv)]<-p.adjust(pwc.allf.cohqv[lower.tri(pwc.allf.cohqv)], method="fdr")
+pwc.allf.cohqv[1:5,1:5]#check
+pwc.allf.cohqv.utri<-pwc.allf.cohqv
+pwc.allf.cohqv.utri[upper.tri(pwc.allf.cohqv.utri)]<-NA
+pwc.allf.cohqv.utri<-t(pwc.allf.cohqv.utri)
+pwc.allf.cohqv[upper.tri(pwc.allf.cohqv)]<-pwc.allf.cohqv.utri[upper.tri(pwc.allf.cohqv.utri)]
+pwc.allf.cohqv[1:5,1:5]#check
+length(which(pwc.allf.cohqv<0.10))#7 are less than 20% fdr, 6 < 15% fdr, 6 < 10% fdr
+length(which(!is.na(pwc.allf.cohqv)))#42 not NAs, ie. 21 possible combinations
+#with fdr<20%, 7 out of the 21 (33.33%) pairwise rships were significantly coherent across all timescales.
+
+#####plot of barchart
+pcentsig<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_20200518.csv")
+str(pcentsig)
+psigp1<-ggplot(pcentsig, aes(x=fao, y=percentsig, fill=dat))
+psigp1 + geom_bar(stat="identity", position="dodge") + theme_bw() +
+  scale_fill_discrete(name="Data type") + scale_y_continuous(expand = c(0, 0), limits=c(0,65)) +
+  labs(x="FAO region", y="Percentage of significant coherences (FDR<20%)") + 
+  theme(legend.position = c(.85, .85)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
+ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_fdr20_20200518.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
