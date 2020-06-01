@@ -449,6 +449,13 @@ length(which(!is.na(ioe.allf.cohqv)))#110 not NAs, ie. 55 possible combinations
 #how to show this as a figure? Perhaps have a figure showing catch of some species that are coherent, and same species of biomass that are coh?
 #could probably check if BLKMARLINIO, SBT (southern bluefin tuna, thunnus maccoyi), SKJCIO (skipjack, katsuwonus pelamis), rock lobster occur in both sets
 
+#delete SBT_fdat from all the results. can I just delete the first row and first column?
+ioe.allf.coh2<-ioe.allf.coh[-1,-1]
+ioe.allf.cohqv2<-ioe.allf.cohqv[-1,-1]
+length(which(!is.na(ioe.allf.cohqv2)))#90 obs, ie. 45 possible pairwise obs.
+length(which(ioe.allf.cohqv2<0.10))#8 are fdr<20%, 2 are fdr<15% and fdr<10%
+#with fdr<20%, 8 out of 45 (17.78%) pairwise rships were significantly coherent.
+
 #quick plot of biomass timeseries?
 str(ioe.tb.50yr.cd)#8 stocks from 1965-2014
 ioe.tb.df<-as.data.frame(t(ioe.tb.50yr.cd))
@@ -569,11 +576,22 @@ length(which(!is.na(pwc.allf.cohqv)))#42 not NAs, ie. 21 possible combinations
 #with fdr<20%, 7 out of the 21 (33.33%) pairwise rships were significantly coherent across all timescales.
 
 #####plot of barchart
-pcentsig<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_20200518.csv")
+pcentsig<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_20200601.csv")
 str(pcentsig)
 psigp1<-ggplot(pcentsig, aes(x=fao, y=percentsig, fill=dat))
 psigp1 + geom_bar(stat="identity", position="dodge") + theme_bw() +
   scale_fill_discrete(name="Data type") + scale_y_continuous(expand = c(0, 0), limits=c(0,65)) +
   labs(x="FAO region", y="Percentage of significant coherences (FDR<20%)") + 
   theme(legend.position = c(.85, .85)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
-ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_fdr20_20200518.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
+ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_fdr20_20200601.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
+
+
+#####plots of synchrony matrices
+colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_tb_fdr20_20200601.png", 
+    width=1400, height=1300, units="px", res=120)
+corrplot(ioe.tb.coh, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.tb.cohqv, 
+         sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
+mtext("IOE Biomass Coherence (fdr<20%)", side=3, line=2)
+dev.off()
