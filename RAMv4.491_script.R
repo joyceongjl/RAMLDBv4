@@ -588,10 +588,15 @@ ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_r
 
 #####plots of synchrony matrices
 colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
-png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_tb_fdr20_20200601.png", 
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_f_fdr20_20200604.png", 
     width=1400, height=1300, units="px", res=120)
-corrplot(ioe.tb.coh, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
-         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.tb.cohqv, 
+corrplot(ioe.allf.coh2, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.allf.cohqv2, 
          sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
-mtext("IOE Biomass Coherence (fdr<20%)", side=3, line=2)
+mtext("IOE Fishing Coherence (fdr<20%)", side=3, line=2)
 dev.off()
+
+#change names from pwc.allf.coh and ioe.allf.coh2 to get rid of _fdat and _erdat
+rownames(ioe.allf.coh2)<-gsub("_fdat", "", rownames(ioe.allf.coh2))
+rownames(ioe.allf.coh2)<-gsub("_erdat", "", rownames(ioe.allf.coh2))
+colnames(ioe.allf.coh2)<-rownames(ioe.allf.coh2)
