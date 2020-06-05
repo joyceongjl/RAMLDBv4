@@ -396,7 +396,7 @@ str(ioe.tb.50yr.mat2)#8 stocks from 1965-2014, 50yr ts
 str(ane.tb.53yr.mat2)#37 stocks from 1965-2017, 53yr ts
 str(pwc.tb.50yr.mat2)#4 stocks from 1966-2015, 50yr ts
 
-str(ioe.allf.57yr.mat3)#11 stocks from 1960-2016, 57yr ts
+str(ioe.allf.57yr.mat3)#11 stocks from 1960-2016, 57yr ts, after taking out dups, its 9 stocks
 str(ane.allf.46yr.mat3)#59 stocks from 1972-2017, 46yr ts
 str(pwc.allf.49yr.mat3)#7 stocks from 1967-2015, 49yr ts
 
@@ -455,6 +455,17 @@ ioe.allf.cohqv2<-ioe.allf.cohqv[-1,-1]
 length(which(!is.na(ioe.allf.cohqv2)))#90 obs, ie. 45 possible pairwise obs.
 length(which(ioe.allf.cohqv2<0.10))#8 are fdr<20%, 2 are fdr<15% and fdr<10%
 #with fdr<20%, 8 out of 45 (17.78%) pairwise rships were significantly coherent.
+
+#delete SWhitse_fdat
+head(ioe.allf.coh2)
+ioe.allf.coh3<-ioe.allf.coh2[-1,-1]
+ioe.allf.cohqv3<-ioe.allf.cohqv2[-1,-1]
+rownames(ioe.allf.coh3)
+head(ioe.allf.cohqv3)
+length(which(!is.na(ioe.allf.cohqv3)))#72 obs, ie. 36 possible pairwise obs.
+length(which(ioe.allf.cohqv3<0.20))#5 are fdr<20%, 1 are fdr<15% and fdr<10%
+#with fdr<20%, 5 out of 36 (13.89%) pairwise rships were significantly coherent.
+
 
 #quick plot of biomass timeseries?
 str(ioe.tb.50yr.cd)#8 stocks from 1965-2014
@@ -579,19 +590,19 @@ length(which(!is.na(pwc.allf.cohqv)))#42 not NAs, ie. 21 possible combinations
 pcentsig<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_20200601.csv")
 str(pcentsig)
 psigp1<-ggplot(pcentsig, aes(x=fao, y=percentsig, fill=dat))
-psigp1 + geom_bar(stat="identity", position="dodge") + theme_bw() +
+psigp1 + geom_bar(stat="identity", position="dodge") + theme_bw(base_size = 14) +
   scale_fill_discrete(name="Data type") + scale_y_continuous(expand = c(0, 0), limits=c(0,65)) +
   labs(x="FAO region", y="Percentage of significant coherences (FDR<20%)") + 
   theme(legend.position = c(.85, .85)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
-ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_fdr20_20200601.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
+ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_fdr20_20200605.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
 
 
 #####plots of synchrony matrices
 colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
-png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_f_fdr20_20200604.png", 
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_f_fdr20_20200605.png", 
     width=1400, height=1300, units="px", res=120)
-corrplot(ioe.allf.coh2, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
-         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.allf.cohqv2, 
+corrplot(ioe.allf.coh3, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.allf.cohqv3, 
          sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
 mtext("IOE Fishing Coherence (fdr<20%)", side=3, line=2)
 dev.off()
