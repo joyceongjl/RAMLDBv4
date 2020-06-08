@@ -611,3 +611,9 @@ dev.off()
 rownames(ioe.allf.coh2)<-gsub("_fdat", "", rownames(ioe.allf.coh2))
 rownames(ioe.allf.coh2)<-gsub("_erdat", "", rownames(ioe.allf.coh2))
 colnames(ioe.allf.coh2)<-rownames(ioe.allf.coh2)
+
+ane.allf.names<-gsub("_fdat", "", dimnames(ane.allf.46yr.cd)[[1]])
+ane.allf.names<-gsub("_erdat", "", ane.allf.names)
+duplicated(ane.allf.names)#no duplicates
+sort(ane.allf.names)
+ane.allf.namesdf<-as.data.frame(sort(ane.allf.names))
