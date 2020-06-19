@@ -617,3 +617,41 @@ ane.allf.names<-gsub("_erdat", "", ane.allf.names)
 duplicated(ane.allf.names)#no duplicates
 sort(ane.allf.names)
 ane.allf.namesdf<-as.data.frame(sort(ane.allf.names))
+
+#making flexible color bar
+color.bar <- function(lut, min, max=-min, nticks=11, ticks=seq(min, max, len=nticks), title='') {
+  scale = (length(lut)-1)/(max-min)
+  
+  dev.new(width=1.75, height=5)
+  plot(c(0,10), c(min,max), type='n', bty='n', xaxt='n', xlab='', yaxt='n', ylab='', main=title)
+  axis(2, ticks, las=1)
+  for (i in 1:(length(lut)-1)) {
+    y = (i-1)/scale + min
+    rect(0,y,10,y+1/scale, col=lut[i], border=NA)
+  }
+}
+color.bar(colorRampPalette(c("blue", "white", "red"))(100), -1)
+#save as colorbar.eps in folder for global MS.
+
+#table of stockid, FAO regions and species names
+str(er.70yrfaosp)#381 obs of 75 var
+str(tb.69tsfaosp)#228 obs of 73 vars
+er.fao.sp<-er.70yrfaosp[,71:74]
+str(er.fao.sp)#381 obs of 4 vars
+hotspot<-c("21", "27", "57")
+er.fao3.sp<-er.fao.sp %>% filter(primary_FAOarea %in% hotspot) %>% as.data.frame()
+str(er.fao3.sp)#82 stocks but should only be 75
+er.fao3.sp$stockid#seems wrong
+
+#or perhaps, just do left_join using stockid after compiling all the stockids from each place
+str(stk_fao_sp_key)
+tb.69tsfaosp<-tb.69ts %>% left_join(stk_fao_sp_key, by="stockid")
+str(pwc.allf.49yr.mat3)#7 stocks
+dimnames(pwc.allf.49yr.mat3)[[1]]
+str(ane.allf.namesdf)#59 stocks
+pwc.allf.names<-gsub("_fdat", "", dimnames(pwc.allf.49yr.mat3)[[1]])
+pwc.allf.names<-gsub("_erdat", "", pwc.allf.names)
+duplicated(pwc.allf.names)#no duplicates
+str(pwc.allf.names)#character
+ioe.allf.names<-rownames(ioe.allf.coh3)#9 stocks
+str(ioe.allf.names)#character
