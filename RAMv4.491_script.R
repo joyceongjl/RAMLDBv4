@@ -655,3 +655,4 @@ duplicated(pwc.allf.names)#no duplicates
 str(pwc.allf.names)#character
 ioe.allf.names<-rownames(ioe.allf.coh3)#9 stocks
 str(ioe.allf.names)#character
+allf.75stks<-#could not do rbind. why? 
