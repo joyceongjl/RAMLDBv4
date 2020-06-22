@@ -644,15 +644,52 @@ str(er.fao3.sp)#82 stocks but should only be 75
 er.fao3.sp$stockid#seems wrong
 
 #or perhaps, just do left_join using stockid after compiling all the stockids from each place
-str(stk_fao_sp_key)
-tb.69tsfaosp<-tb.69ts %>% left_join(stk_fao_sp_key, by="stockid")
 str(pwc.allf.49yr.mat3)#7 stocks
 dimnames(pwc.allf.49yr.mat3)[[1]]
 str(ane.allf.namesdf)#59 stocks
+ane.allf.names2<-as.data.frame(ane.allf.namesdf)
+colnames(ane.allf.names2)<-"stockid"
+str(ane.allf.names2)
 pwc.allf.names<-gsub("_fdat", "", dimnames(pwc.allf.49yr.mat3)[[1]])
 pwc.allf.names<-gsub("_erdat", "", pwc.allf.names)
 duplicated(pwc.allf.names)#no duplicates
 str(pwc.allf.names)#character
 ioe.allf.names<-rownames(ioe.allf.coh3)#9 stocks
 str(ioe.allf.names)#character
-allf.75stks<-#could not do rbind. why? 
+allf.75stks<-c(pwc.allf.names, ioe.allf.names)
+allf.75stks<-as.data.frame(allf.75stks)
+str(allf.75stks)
+colnames(allf.75stks)<-"stockid"
+allf.75stks2<-rbind(ane.allf.names2, allf.75stks)
+
+#now do left_join
+str(stk_fao_sp_key)
+allf.75stks3<-allf.75stks2 %>% left_join(stk_fao_sp_key, by="stockid") %>% as.data.frame()
+str(allf.75stks3)
+allf.75stks4<-allf.75stks3 %>% 
+  mutate(primary_FAOarea=recode(primary_FAOarea, "27" = "ANE", "57" = "IOE", "71" = "PWC")) %>%
+  as.data.frame()
+write.csv(allf.75stks4, "allf.75stks4.csv")
+
+#table for biomass stocks, combine with fishing effort
+dimnames(ane.tb.53yr.cd)[[1]]
+dimnames(pwc.tb.50yr.cd)[[1]]
+dimnames(ioe.tb.50yr.cd)[[1]]
+#49 stocks in total for biomass
+tb49.stks<-c(dimnames(ane.tb.53yr.cd)[[1]], dimnames(pwc.tb.50yr.cd)[[1]], dimnames(ioe.tb.50yr.cd)[[1]])
+tb49.stks<-as.data.frame(tb49.stks)
+colnames(tb49.stks)<-"stockid"
+str(tb49.stks)
+str(allf.75stks2)
+tb.f.names<-rbind(tb49.stks, allf.75stks2)
+str(tb.f.names)
+unique(tb.f.names$stockid)#75 unique values
+tb.f.names2<-tb.f.names %>% distinct() %>% as.data.frame()
+str(tb.f.names2)
+tb.f.names3<-tb.f.names2 %>% left_join(stk_fao_sp_key, by="stockid") %>% as.data.frame()
+str(tb.f.names3)
+tb.f.names4<-tb.f.names3 %>% 
+  mutate(primary_FAOarea=recode(primary_FAOarea, "27" = "ANE", "57" = "IOE", "71" = "PWC")) %>%
+  as.data.frame()
+str(tb.f.names4)
+write.csv(tb.f.names4, "tb.f.75stocks.csv")
