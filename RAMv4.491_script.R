@@ -693,3 +693,261 @@ tb.f.names4<-tb.f.names3 %>%
   as.data.frame()
 str(tb.f.names4)
 write.csv(tb.f.names4, "tb.f.75stocks.csv")
+
+####sensitivity tests for including median values in 10% of missing values
+#Case study 1- high coh: IOE biomass (no NAs is fr 1970-2007) 
+str(ioe.tb.50yr.cd)
+dimnames(ioe.tb.50yr.cd)[[2]]
+ioe.wmf<-wmf(ioe.tb.50yr.cd, times=1965:2014)
+plotmag(ioe.wmf)
+ioe.wpmf<-wpmf(ioe.tb.50yr.cd, times=1965:2014, sigmethod = "quick", nrand=10000)
+plotmag(ioe.wpmf)
+
+str(ioe.tb.50yr.mat)
+dimnames(ioe.tb.50yr.mat)[[2]]
+ioe.noNA<-ioe.tb.50yr.mat[1:8,6:43]
+str(ioe.noNA)
+ioe.noNA.cd<-cleandat(ioe.noNA, times=1970:2007, clev=5)$cdat
+str(ioe.noNA.cd)
+dimnames(ioe.noNA.cd)[[1]]
+
+ioe.noNA.wpmf<-wpmf(ioe.noNA.cd, times=1970:2007, sigmethod = "quick", nrand=10000)
+plotmag(ioe.noNA.wpmf)
+
+ioe.noNA.cohsig<-synmat(ioe.noNA.cd, times=1970:2007, method="coh.sig.fast", scale.min=2, scale.max=12, nsurrogs=1000)
+rownames(ioe.noNA.cohsig)<-dimnames(ioe.noNA.cd)[[1]]
+colnames(ioe.noNA.cohsig)<-dimnames(ioe.noNA.cd)[[1]]
+ioe.noNA.cohpv<-1-ioe.noNA.cohsig
+ioe.noNA.cohqv<-ioe.noNA.cohpv
+ioe.noNA.cohqv[lower.tri(ioe.noNA.cohqv)]<-p.adjust(ioe.noNA.cohqv[lower.tri(ioe.noNA.cohqv)], method="fdr")
+ioe.noNA.cohqv[1:5,1:5]#check
+ioe.noNA.cohqv.utri<-ioe.noNA.cohqv
+ioe.noNA.cohqv.utri[upper.tri(ioe.noNA.cohqv.utri)]<-NA
+ioe.noNA.cohqv.utri<-t(ioe.noNA.cohqv.utri)
+ioe.noNA.cohqv[upper.tri(ioe.noNA.cohqv)]<-ioe.noNA.cohqv.utri[upper.tri(ioe.noNA.cohqv.utri)]
+ioe.noNA.cohqv[1:5,1:5]#check
+length(which(ioe.noNA.cohqv<0.20))#15 are less than 20% fdr, previously 16
+#with fdr<20%, 15 out of the 28 (53.57%) pairwise rships were significantly coherent across all timescales.
+
+colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/sens_corrplot_RAM_ioe_noNAs_tb_fdr20_20200710.png", 
+    width=1400, height=1300, units="px", res=120)
+corrplot(ioe.noNA.cohsig, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.noNA.cohqv, 
+         sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
+mtext("IOE no NAs Biomass (fdr<20%)", side=3, line=2)
+dev.off()
+#% of sig coh rships similar but the actual pairs are different... hmm.. 
+
+#case study 2- high coh: PWC fishing effort (no NAs is 1972-2006).
+str(pwc.allf.49yr.cd)
+dimnames(pwc.allf.49yr.cd)[[2]]
+pwc.allf.wmf<-wmf(pwc.allf.49yr.cd, times=1967:2015)
+plotmag(pwc.allf.wmf)
+pwc.allf.wpmf<-wpmf(pwc.allf.49yr.cd, times=1967:2015, sigmethod = "quick", nrand=10000)
+plotmag(pwc.tb.wpmf)
+
+str(pwc.allf.49yr.mat3)
+dimnames(pwc.allf.49yr.mat3)[[2]]
+pwc.noNA<-pwc.allf.49yr.mat3[1:7,6:40]
+str(pwc.noNA)#35 year time series
+dimnames(pwc.noNA)
+
+pwc.noNA.cd<-cleandat(pwc.noNA, times=1972:2006, clev=5)$cdat
+str(pwc.noNA.cd)
+dimnames(pwc.noNA.cd)[[1]]
+pwc.noNA.wpmf<-wpmf(pwc.noNA.cd, times=1972:2006, sigmethod = "quick", nrand=10000)
+plotmag(pwc.noNA.wpmf)
+
+pwc.noNA.coh<-synmat(pwc.noNA.cd, times=1972:2006, method="coh.sig.fast", scale.min=2, scale.max=11, nsurrogs=1000)
+rownames(pwc.noNA.coh)<-dimnames(pwc.noNA.cd)[[1]]
+colnames(pwc.noNA.coh)<-dimnames(pwc.noNA.cd)[[1]]
+pwc.noNA.cohpv<-1-pwc.noNA.coh
+pwc.noNA.cohqv<-pwc.noNA.cohpv
+pwc.noNA.cohqv[lower.tri(pwc.noNA.cohqv)]<-p.adjust(pwc.noNA.cohqv[lower.tri(pwc.noNA.cohqv)], method="fdr")
+pwc.noNA.cohqv[1:5,1:5]#check
+pwc.noNA.cohqv.utri<-pwc.noNA.cohqv
+pwc.noNA.cohqv.utri[upper.tri(pwc.noNA.cohqv.utri)]<-NA
+pwc.noNA.cohqv.utri<-t(pwc.noNA.cohqv.utri)
+pwc.noNA.cohqv[upper.tri(pwc.noNA.cohqv)]<-pwc.noNA.cohqv.utri[upper.tri(pwc.noNA.cohqv.utri)]
+pwc.noNA.cohqv[1:5,1:5]#check
+length(which(pwc.noNA.cohqv<0.20))#0 are less than 20% fdr, previously 7
+length(which(pwc.noNA.cohpv<0.01))#2 are less than p<0.05
+
+colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/sens_corrplot_RAM_pwc_noNAs_allf_p0.05_20200710.png", 
+    width=1400, height=1300, units="px", res=120)
+corrplot(pwc.noNA.coh, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=pwc.noNA.cohpv, 
+         sig.level=0.05, insig="blank", cl.ratio=0.1, tl.cex=1)
+mtext("PWC no NAs Biomass (p<0.05)", side=3, line=2)
+dev.off()
+#none of the pairwise rships are sig now, which is a bit worrying. Perhaps I do need to trim the data so it only includes real data? 
+
+#case study 3 - low coh: ANE biomass (no NAs is fr 1980-2012)
+str(ane.tb.53yr.mat2)#37 stocks from 1965-2017, 53yr ts
+str(ane.tb.53yr.cd)
+dimnames(ane.tb.53yr.cd)[[2]]
+
+ane.tb.wmf<-wmf(ane.tb.53yr.cd, times=1965:2017)
+plotmag(ane.tb.wmf)#no synchrony
+ane.tb.wpmf<-wpmf(ane.tb.53yr.cd, times=1965:2017, sigmethod = "quick", nrand=10000)
+plotmag(ane.tb.wpmf)
+
+dimnames(ane.tb.53yr.mat2)[[2]]
+str(ane.tb.53yr.mat2)
+ane.tb.noNA<-ane.tb.53yr.mat2[1:37,16:48]
+str(ane.tb.noNA)# 33 yr time series
+ane.tb.noNA.cd<-cleandat(ane.tb.noNA, times=1980:2012, clev=5)$cdat
+str(ane.tb.noNA.cd)
+dimnames(ane.tb.noNA.cd)[[1]]
+ane.tb.noNA.wpmf<-wpmf(ane.tb.noNA.cd, times=1980:2012, sigmethod = "quick", nrand=10000)
+plotmag(ane.tb.noNA.wpmf)
+
+ane.tb.noNA.coh<-synmat(ane.tb.noNA.cd, times=1980:2012, method="coh.sig.fast", scale.min=2, scale.max=11, nsurrogs=1000)
+rownames(ane.tb.noNA.coh)<-dimnames(ane.tb.noNA.cd)[[1]]
+colnames(ane.tb.noNA.coh)<-dimnames(ane.tb.noNA.cd)[[1]]
+ane.tb.noNA.cohpv<-1-ane.tb.noNA.coh
+ane.tb.noNA.cohqv<-ane.tb.noNA.cohpv
+ane.tb.noNA.cohqv[lower.tri(ane.tb.noNA.cohqv)]<-p.adjust(ane.tb.noNA.cohqv[lower.tri(ane.tb.noNA.cohqv)], method="fdr")
+ane.tb.noNA.cohqv[1:5,1:5]#check
+ane.tb.noNA.cohqv.utri<-ane.tb.noNA.cohqv
+ane.tb.noNA.cohqv.utri[upper.tri(ane.tb.noNA.cohqv.utri)]<-NA
+ane.tb.noNA.cohqv.utri<-t(ane.tb.noNA.cohqv.utri)
+ane.tb.noNA.cohqv[upper.tri(ane.tb.noNA.cohqv)]<-ane.tb.noNA.cohqv.utri[upper.tri(ane.tb.noNA.cohqv.utri)]
+ane.tb.noNA.cohqv[1:5,1:5]#check
+length(which(ane.tb.noNA.cohqv<0.20))#11 are less than 20% fdr
+
+colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/sens_corrplot_RAM_ane_tb_noNAs_fdr20_20200710.png", 
+    width=1400, height=1300, units="px", res=120)
+corrplot(ane.tb.noNA.coh, method="color", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ane.tb.noNA.cohqv, 
+         sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
+mtext("ANE no NAs Biomass (fdr<20%)", side=3, line=2)
+dev.off()
+#less sig coh rships, but both still <10%. Would still be ok. 
+
+###case study 4 - low coh: ANE fishing effort (no NAs is fr 1982-2013)
+str(ane.allf.46yr.mat3)#59 stocks from 1972-2017, 46yr ts
+str(ane.allf.46yr.cd)
+dimnames(ane.allf.46yr.cd)[[2]]
+
+ane.allf.wmf<-wmf(ane.allf.46yr.cd, times=1972:2017)
+plotmag(ane.allf.wmf)
+ane.allf.wpmf<-wpmf(ane.allf.46yr.cd, times=1972:2017, sigmethod = "quick", nrand=10000)
+plotmag(ane.allf.wpmf)
+
+dimnames(ane.allf.46yr.mat3)[[2]]
+str(ane.allf.46yr.mat3)
+ane.allf.noNA<-ane.allf.46yr.mat3[1:59,11:42]
+str(ane.allf.noNA)#32 year time series
+ane.allf.noNA.cd<-cleandat(ane.allf.noNA, times=1982:2013, clev=5)$cdat
+str(ane.allf.noNA.cd)
+ane.allf.noNA.wpmf<-wpmf(ane.allf.noNA.cd, times=1982:2013, sigmethod = "quick", nrand=10000)
+plotmag(ane.allf.noNA.wpmf)
+
+ane.allf.noNA.coh<-synmat(ane.allf.noNA.cd, times=1982:2013, method="coh.sig.fast", scale.min=2, scale.max=10, nsurrogs=1000)
+rownames(ane.allf.noNA.coh)<-dimnames(ane.allf.noNA.cd)[[1]]
+colnames(ane.allf.noNA.coh)<-dimnames(ane.allf.noNA.cd)[[1]]
+ane.allf.noNA.cohpv<-1-ane.allf.noNA.coh
+ane.allf.noNA.cohqv<-ane.allf.noNA.cohpv
+ane.allf.noNA.cohqv[lower.tri(ane.allf.noNA.cohqv)]<-p.adjust(ane.allf.noNA.cohqv[lower.tri(ane.allf.noNA.cohqv)], method="fdr")
+ane.allf.noNA.cohqv[1:5,1:5]#check
+ane.allf.noNA.cohqv.utri<-ane.allf.noNA.cohqv
+ane.allf.noNA.cohqv.utri[upper.tri(ane.allf.noNA.cohqv.utri)]<-NA
+ane.allf.noNA.cohqv.utri<-t(ane.allf.noNA.cohqv.utri)
+ane.allf.noNA.cohqv[upper.tri(ane.allf.noNA.cohqv)]<-ane.allf.noNA.cohqv.utri[upper.tri(ane.allf.noNA.cohqv.utri)]
+ane.allf.noNA.cohqv[1:5,1:5]#check
+length(which(ane.allf.noNA.cohqv<0.20))#0 are less than 20% fdr, previously 0
+
+###finish up the other 2 regions
+str(ioe.allf.57yr.mat)
+#no NAs is 1970-2007, 38 year timeseries
+dimnames(ioe.allf.57yr.mat)[[2]]
+ioe.allf.noNA<-ioe.allf.57yr.mat[1:12,11:48]
+str(ioe.allf.noNA)#38 year time series
+#delete 1-3 species cos duplication.
+dimnames(ioe.allf.noNA)[[1]]
+ioe.allf.noNA<-ioe.allf.noNA[4:12,]
+ioe.allf.noNA.cd<-cleandat(ioe.allf.noNA, times=1970:2007, clev=5)$cdat
+str(ioe.allf.noNA.cd)#should only be 9 stocks
+
+str(ioe.allf.57yr.cd)
+dimnames(ioe.allf.57yr.cd)[[2]]
+ioe.allf.57yr.cd1<-ioe.allf.57yr.cd[3:11,]
+str(ioe.allf.57yr.cd1)#9 stocks, 1960-2016
+ioe.allf.wmf<-wmf(ioe.allf.57yr.cd1, times=1960:2016)
+plotmag(ioe.allf.wmf)
+ioe.allf.wpmf<-wpmf(ioe.allf.57yr.cd1, times=1960:2016, sigmethod = "quick", nrand=10000)
+plotmag(ioe.allf.wpmf)
+
+ioe.allf.noNA.wpmf<-wpmf(ioe.allf.noNA.cd, times=1970:2007, sigmethod = "quick", nrand=10000)
+plotmag(ioe.allf.noNA.wpmf)
+
+ioe.allf.noNA.coh<-synmat(ioe.allf.noNA.cd, times=1970:2007, method="coh.sig.fast", scale.min=2, scale.max=12, nsurrogs=1000)
+rownames(ioe.allf.noNA.coh)<-dimnames(ioe.allf.noNA.cd)[[1]]
+colnames(ioe.allf.noNA.coh)<-dimnames(ioe.allf.noNA.cd)[[1]]
+ioe.allf.noNA.cohpv<-1-ioe.allf.noNA.coh
+ioe.allf.noNA.cohqv<-ioe.allf.noNA.cohpv
+ioe.allf.noNA.cohqv[lower.tri(ioe.allf.noNA.cohqv)]<-p.adjust(ioe.allf.noNA.cohqv[lower.tri(ioe.allf.noNA.cohqv)], method="fdr")
+ioe.allf.noNA.cohqv[1:5,1:5]#check
+ioe.allf.noNA.cohqv.utri<-ioe.allf.noNA.cohqv
+ioe.allf.noNA.cohqv.utri[upper.tri(ioe.allf.noNA.cohqv.utri)]<-NA
+ioe.allf.noNA.cohqv.utri<-t(ioe.allf.noNA.cohqv.utri)
+ioe.allf.noNA.cohqv[upper.tri(ioe.allf.noNA.cohqv)]<-ioe.allf.noNA.cohqv.utri[upper.tri(ioe.allf.noNA.cohqv.utri)]
+ioe.allf.noNA.cohqv[1:5,1:5]#check
+length(which(ioe.allf.noNA.cohqv<0.20))#9 are less than 20% fdr, previously 5
+
+rownames(ioe.allf.noNA.coh)<-gsub("_fdat", "", rownames(ioe.allf.noNA.coh))
+rownames(ioe.allf.noNA.coh)<-gsub("_erdat", "", rownames(ioe.allf.noNA.coh))
+colnames(ioe.allf.noNA.coh)<-rownames(ioe.allf.noNA.coh)
+
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/sens_corrplot_RAM_ioe_f_noNAs_fdr20_20200714.png", 
+    width=1400, height=1300, units="px", res=120)
+corrplot(ioe.allf.noNA.coh, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.allf.noNA.cohqv, 
+         sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
+mtext("IOE no NAs Fishing (fdr<20%)", side=3, line=2)
+dev.off()
+
+#PWC biomass
+str(pwc.tb.50yr.mat)# 4 stocks, 1966-2015
+dimnames(pwc.tb.50yr.mat)[[2]]
+str(pwc.tb.50yr.cd)
+pwc.tb.wmf<-wmf(pwc.tb.50yr.cd, times=1966:2015)
+plotmag(pwc.tb.wmf)
+pwc.tb.wpmf<-wpmf(pwc.tb.50yr.cd, times=1966:2015, sigmethod = "quick", nrand=10000)
+plotmag(pwc.tb.wpmf)
+#no NAs is 1972-2011, 40 year timeseries
+dimnames(pwc.tb.50yr.mat)[[2]]
+pwc.tb.noNA<-pwc.tb.50yr.mat[,7:46]
+str(pwc.tb.noNA)
+pwc.tb.noNA.cd<-cleandat(pwc.tb.noNA, times=1972:2011, clev=5)$cdat
+str(pwc.tb.noNA.cd)#should only be 9 stocks
+pwc.tb.noNA.wpmf<-wpmf(pwc.tb.noNA.cd, times=1972:2011, sigmethod = "quick", nrand=10000)
+plotmag(pwc.tb.noNA.wpmf)
+
+pwc.tb.noNA.coh<-synmat(pwc.tb.noNA.cd, times=1972:2011, method="coh.sig.fast", scale.min=2, scale.max=13, nsurrogs=1000)
+rownames(pwc.tb.noNA.coh)<-dimnames(pwc.tb.noNA.cd)[[1]]
+colnames(pwc.tb.noNA.coh)<-dimnames(pwc.tb.noNA.cd)[[1]]
+pwc.tb.noNA.cohpv<-1-pwc.tb.noNA.coh
+pwc.tb.noNA.cohqv<-pwc.tb.noNA.cohpv
+pwc.tb.noNA.cohqv[lower.tri(pwc.tb.noNA.cohqv)]<-p.adjust(pwc.tb.noNA.cohqv[lower.tri(pwc.tb.noNA.cohqv)], method="fdr")
+pwc.tb.noNA.cohqv
+pwc.tb.noNA.cohqv.utri<-pwc.tb.noNA.cohqv
+pwc.tb.noNA.cohqv.utri[upper.tri(pwc.tb.noNA.cohqv.utri)]<-NA
+pwc.tb.noNA.cohqv.utri<-t(pwc.tb.noNA.cohqv.utri)
+pwc.tb.noNA.cohqv[upper.tri(pwc.tb.noNA.cohqv)]<-pwc.tb.noNA.cohqv.utri[upper.tri(pwc.tb.noNA.cohqv.utri)]
+pwc.tb.noNA.cohqv
+length(which(pwc.tb.noNA.cohqv<0.20))#0 are less than 20% fdr
+
+####new bar plot of percent sig in hotspots
+pcentsignoNA<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_noNA_20200714.csv")
+str(pcentsignoNA)
+psigp2<-ggplot(pcentsignoNA, aes(x=fao, y=percentsig, fill=dat))
+psigp2 + geom_bar(stat="identity", position="dodge") + theme_bw(base_size = 14) +
+  scale_fill_discrete(name="Data type") + scale_y_continuous(expand = c(0, 0), limits=c(0,65)) +
+  labs(x="FAO region", y="Percentage of significant coherences (FDR<20%)") + 
+  theme(legend.position = c(.85, .85)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
+ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_noNA_fdr20_20200714.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
