@@ -745,7 +745,7 @@ dimnames(pwc.allf.49yr.cd)[[2]]
 pwc.allf.wmf<-wmf(pwc.allf.49yr.cd, times=1967:2015)
 plotmag(pwc.allf.wmf)
 pwc.allf.wpmf<-wpmf(pwc.allf.49yr.cd, times=1967:2015, sigmethod = "quick", nrand=10000)
-plotmag(pwc.tb.wpmf)
+plotmag(pwc.allf.wpmf)
 
 str(pwc.allf.49yr.mat3)
 dimnames(pwc.allf.49yr.mat3)[[2]]
