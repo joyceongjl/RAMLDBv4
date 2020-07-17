@@ -951,3 +951,23 @@ psigp2 + geom_bar(stat="identity", position="dodge") + theme_bw(base_size = 14) 
   labs(x="FAO region", y="Percentage of significant coherences (FDR<20%)") + 
   theme(legend.position = c(.85, .85)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
 ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_noNA_fdr20_20200714.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
+
+###what do constant values become in wavelets? test with NZLINGWSE
+plot(seq(1970, 2007,1), ioe.noNA[3,], type="l", col="black")
+plot(seq(1970, 2007,1), ioe.noNA.cd[3,], type="l", col="blue")
+plot(seq(1965, 2014,1), ioe.tb.50yr.cd[3,], type="l", col="red")
+
+wmed<-wt(ioe.tb.50yr.cd[3,], times=1965:2014)
+plotmag(wmed, title="using median values")
+noNA<-wt(ioe.noNA.cd[3,], times=1970:2007)
+plotmag(noNA, title="no missing values")
+
+#Should I test with another species? try with no. 4, rock lobster
+plot(seq(1970, 2007,1), ioe.noNA[4,], type="l", col="black")
+plot(seq(1970, 2007,1), ioe.noNA.cd[4,], type="l", col="blue")
+plot(seq(1965, 2014,1), ioe.tb.50yr.cd[4,], type="l", col="red")
+
+wmed4<-wt(ioe.tb.50yr.cd[3,], times=1965:2014)
+plotmag(wmed4)
+noNA4<-wt(ioe.noNA.cd[3,], times=1970:2007)
+plotmag(noNA4)
