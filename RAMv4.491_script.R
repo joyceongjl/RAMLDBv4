@@ -971,3 +971,5 @@ wmed4<-wt(ioe.tb.50yr.cd[3,], times=1965:2014)
 plotmag(wmed4)
 noNA4<-wt(ioe.noNA.cd[3,], times=1970:2007)
 plotmag(noNA4)
+
+write.csv(ane.tb.53yr.mat, "D:/Rutgers_postdoc/data/RAM legacy/ane.tb.53yr.mat_20200717.csv")
