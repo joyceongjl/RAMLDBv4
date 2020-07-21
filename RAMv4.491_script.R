@@ -973,3 +973,39 @@ noNA4<-wt(ioe.noNA.cd[3,], times=1970:2007)
 plotmag(noNA4)
 
 write.csv(ane.tb.53yr.mat, "D:/Rutgers_postdoc/data/RAM legacy/ane.tb.53yr.mat_20200717.csv")
+
+############### redo of biomass timeseries to only start where tc>0
+rownames(pwc.tb.50yr)
+str(tcbest.data)#942 stocks
+colnames(tcbest.data)
+head(tcbest.data)
+#only keep 1950-2018 data
+tcbest1950.2018<-tcbest.data[151:219,]
+str(tcbest1950.2018)
+tcbest.69yrs<-as.data.frame(tcbest1950.2018)
+str(tcbest.69yrs)
+colnames(tcbest.69yrs)
+pwc.stk<-c(rownames(pwc.tb.50yr))
+tcbest.69yrs.pwc<- tcbest.69yrs[, (names(tcbest.69yrs) %in% pwc.stk)]
+str(tcbest.69yrs.pwc)#yay just the 4 stocks, catch>0 for all 4 stocks
+
+#ioe
+rownames(ioe.tb.50ts)#8 stocks
+ioe.stk<-c(rownames(ioe.tb.50ts))
+tcbest.69yrs.ioe<- tcbest.69yrs[, (names(tcbest.69yrs) %in% ioe.stk)]
+str(tcbest.69yrs.ioe)#8 stocks
+#2 stocks have catch=0, BGRDRNSWWA should start from 1979, NZLINGWSE should start from 1979 also.
+
+#ane
+rownames(ane.tb.53yr)#37 stocks
+ane.stk<-c(rownames(ane.tb.53yr))
+tcbest.69yrs.ane<- tcbest.69yrs[, (names(tcbest.69yrs) %in% ane.stk)]
+str(tcbest.69yrs.ane)#37 stocks, catch>0 for all stocks. 
+
+#for ane and pwc, just use the .mat matrix. for ioe, put in NAs for the 2 stocks
+str(ioe.tb.50yr.mat)
+ioe.tb.50yr.mat.new<-ioe.tb.50yr.mat
+ioe.tb.50yr.mat.new[1,1:14]<-NA
+ioe.tb.50yr.mat.new[3,1:14]<-NA
+
+#how to do synmat if all are different lengths? 
