@@ -1008,4 +1008,54 @@ ioe.tb.50yr.mat.new<-ioe.tb.50yr.mat
 ioe.tb.50yr.mat.new[1,1:14]<-NA
 ioe.tb.50yr.mat.new[3,1:14]<-NA
 
+str(ioe.tb.50yr.mat.new)#8 stocks, shortest overlapping period is 29 years, tsrange 2-10
+str(ane.tb.53yr.mat)#37 stocks, shortest overlapping period is 41 years, tsrange 2-13
+str(pwc.tb.50yr.mat)#4 stocks, shortest overlapping period is 40 years, tsrange 2-13
+
 #how to do synmat if all are different lengths? 
+#Code from Jon, try using ioe
+str(ioe.tb.50yr.mat.new)
+#get coh and pvals for rows 2 and 3, from 1979 to 2007. 
+test2n3<-ioe.tb.50yr.mat.new[2:3,15:43]
+t2n3cd<-cleandat(test2n3, times=1979:2007, clev=5)$cdat
+t2n3coh<-coh(t2n3cd[1,], t2n3cd[2,], times=1979:2007, norm="powall",sigmethod="fast")
+t2n3coh<-bandtest(t2n3coh,tsrange)
+t2n3coh$bandp#pval is 0.010989
+t2n3coh$coher
+t2n3coh$timescales
+mncoh<-Mod(mean(t2n3coh$coher))#0.428 with tsrange 2-10
+
+##
+tsrange<-c(2,10)#shortest is 29 years, so I guess 10 could work? 
+nspp<-8
+testmat<-ioe.tb.50yr.mat.new
+
+pvmat<-matrix(NA, nspp, nspp)
+cohmat<-matrix(NA, nspp, nspp)
+mnphmat<-matrix(NA, nspp, nspp)
+
+for(ii in 2:nspp){
+  for(jj in 1:(ii-1)){
+    
+    use<-!is.na(testmat[ii,]) & !is.na(testmat[jj,])
+    tt<-as.numeric(colnames(testmat)[use])
+    yy1<-testmat[ii,use]
+    yy2<-testmat[jj,use]
+    yy1<-cleandat(yy1,tt,clev=5)$cdat
+    yy2<-cleandat(yy2,tt,clev=5)$cdat
+    coh12<-coh(yy1,yy2,tt,norm="powall",sigmethod="fast")
+    coh12<-bandtest(coh12,tsrange)
+    pvmat[ii,jj]<-coh12$bandp$p_val
+    cohmat[ii,jj]<-coh12$bandp$mn_coh
+    mnphmat[ii,jj]<-coh12$bandp$mn_phs
+  }
+}
+
+rownames(ioe.tb.50yr.mat.new)
+rownames(cohmat)<-rownames(ioe.tb.50yr.mat.new)
+colnames(cohmat)<-rownames(ioe.tb.50yr.mat.new)
+ioe.tb.coh.new<-cohmat
+ioe.tb.cohpv.new<-pvmat
+ioe.tb.cohmnph.new<-mnphmat
+ioe.tb.cohqv.new<-ioe.tb.cohpv.new
+ioe.tb.cohqv.new[lower.tri(ioe.tb.cohqv.new)]<-p.adjust(ioe.tb.cohqv.new[lower.tri(ioe.tb.cohqv.new)], method="fdr")
