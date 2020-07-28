@@ -1059,3 +1059,19 @@ ioe.tb.cohpv.new<-pvmat
 ioe.tb.cohmnph.new<-mnphmat
 ioe.tb.cohqv.new<-ioe.tb.cohpv.new
 ioe.tb.cohqv.new[lower.tri(ioe.tb.cohqv.new)]<-p.adjust(ioe.tb.cohqv.new[lower.tri(ioe.tb.cohqv.new)], method="fdr")
+ioe.tb.list<-list(ioe.tb.coh.new, ioe.tb.cohpv.new, ioe.tb.cohqv.new, ioe.tb.cohmnph.new)
+
+length(which(!is.na(ioe.tb.cohqv.new)))#28 possible pairwise obs.
+length(which(ioe.tb.cohqv.new<0.20))#10 out of the 28 are sig with fdr<20%, 35.71%
+
+colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_tb_fdr20_20200727.png", 
+    width=1400, height=1300, units="px", res=120)
+corrplot(ioe.tb.coh.new, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.tb.cohqv.new, 
+         sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
+mtext("IOE Biomass Coherence", side=3, line=2)
+dev.off()
+
+#New coherence values very different from no NA biomass timeseries. Rerun synmat for ioe.noNA
+#rerun coh code for corrected biomass timeseries in new R window. 
