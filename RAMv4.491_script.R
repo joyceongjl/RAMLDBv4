@@ -1066,7 +1066,7 @@ length(which(!is.na(ioe.tb.cohqv.new)))#28 possible pairwise obs.
 length(which(ioe.tb.cohqv.new<0.20))#10 out of the 28 are sig with fdr<20%, 35.71%
 
 colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
-png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_tb_fdr20_20200727.png", 
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_tb_color_fdr20_20200729.png", 
     width=1400, height=1300, units="px", res=120)
 corrplot(ioe.tb.coh.new, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
          col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.tb.cohqv.new, 
@@ -1096,3 +1096,78 @@ length(which(ioe.tb.noNA.cohqv2<0.20))#15 are less than 20% fdr, 53.57%
 length(which(!is.na(ioe.tb.noNA.cohqv2)))#56 not NAs, ie. 28 possible combinations
 
 #perhaps I just need to accept that the coh value is smaller than synmat? Just get the lists for the other regions
+str(ane.tb.53yr.mat)#37 stocks, shortest overlapping period is 41 years, tsrange 2-13
+str(pwc.tb.50yr.mat)#4 stocks, shortest overlapping period is 40 years, tsrange 2-13
+str(ioe.allf.57yr.mat)#12 stocks
+#delete 1-3 species cos duplication of ioe allf timeseries
+dimnames(ioe.allf.noNA)[[1]]
+ioe.allf.noNA<-ioe.allf.noNA[4:12,]
+ioe.allf.noNA.cd<-cleandat(ioe.allf.noNA, times=1970:2007, clev=5)$cdat
+dimnames(ioe.allf.noNA.cd)#should only be 9 stocks
+dimnames(ioe.allf.57yr.mat)
+ioe.allf.57yr.mat.new<-ioe.allf.57yr.mat[4:12,]
+dimnames(ioe.allf.57yr.mat.new)#only 9 stocks, 1960-2016, shortest overlapping period is 38 years, tsrange 2-13
+str(ane.allf.46yr.mat)#105 stocks over 46 years with NAs, 1972-2017
+stks59<-rownames(ane.allf.46yr.ord.df2)
+ane.allf.46yr.mat.new<-ane.allf.46yr.mat[stks59,]
+str(ane.allf.46yr.mat.new)#shortest overlapping period is 27 years, tsrange=2-10 years? 
+str(pwc.allf.49yr.mat)#10 stocks, delete
+dimnames(pwc.allf.49yr.mat)[1]
+#BIGEYECWPAC, SKJCWPAC, YFINCWPAC has f and er, delete f.dat for 3 stocks
+pwc.allf.49yr.mat.new<-pwc.allf.49yr.mat[-c(1,5,6),]
+dimnames(pwc.allf.49yr.mat.new)[[1]]
+str(pwc.allf.49yr.mat.new)#7 stocks from 1967-2015, 49yr ts, shortest overlapping period is 35 years, tsrange = 2-12
+
+##start function for individual pairwise coh analyses
+tsrange<-c(2,12)
+nspp<-7
+testmat<-pwc.allf.49yr.mat.new
+
+pvmat<-matrix(NA, nspp, nspp)
+cohmat<-matrix(NA, nspp, nspp)
+mnphmat<-matrix(NA, nspp, nspp)
+
+for(ii in 2:nspp){
+  for(jj in 1:(ii-1)){
+    
+    use<-!is.na(testmat[ii,]) & !is.na(testmat[jj,])
+    tt<-as.numeric(colnames(testmat)[use])
+    yy1<-testmat[ii,use]
+    yy2<-testmat[jj,use]
+    yy1<-cleandat(yy1,tt,clev=5)$cdat
+    yy2<-cleandat(yy2,tt,clev=5)$cdat
+    coh12<-coh(yy1,yy2,tt,norm="powall",sigmethod="fast")
+    coh12<-bandtest(coh12,tsrange)
+    pvmat[ii,jj]<-coh12$bandp$p_val
+    cohmat[ii,jj]<-Mod(mean(coh12$coher))
+    mnphmat[ii,jj]<-coh12$bandp$mn_phs
+  }
+}
+
+rownames(pwc.allf.49yr.mat.new)
+rownames(cohmat)<-rownames(pwc.allf.49yr.mat.new)
+colnames(cohmat)<-rownames(pwc.allf.49yr.mat.new)
+pwc.f.coh.new<-cohmat
+pwc.f.cohpv.new<-pvmat
+pwc.f.cohmnph.new<-mnphmat
+pwc.f.cohqv.new<-pwc.f.cohpv.new
+pwc.f.cohqv.new[lower.tri(pwc.f.cohqv.new)]<-p.adjust(pwc.f.cohqv.new[lower.tri(pwc.f.cohqv.new)], method="fdr")
+pwc.f.list<-list(pwc.f.coh.new, pwc.f.cohpv.new, pwc.f.cohqv.new, pwc.f.cohmnph.new)
+
+length(which(!is.na(pwc.f.cohqv.new)))#21 possible pairwise obs.
+length(which(pwc.f.cohqv.new<0.20))#1 out of the 21 are sig with fdr<20%, 11.11%
+
+rownames(pwc.f.coh.new)<-gsub("_fdat", "", rownames(pwc.f.coh.new))
+rownames(pwc.f.coh.new)<-gsub("_erdat", "", rownames(pwc.f.coh.new))
+colnames(pwc.f.coh.new)<-rownames(pwc.f.coh.new)
+
+colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_pwc_allf_fdr20_20200729.png", 
+    width=1400, height=1300, units="px", res=120)
+corrplot(pwc.f.coh.new, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=pwc.f.cohqv.new, 
+         sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
+mtext("PWC Fishing Effort Coherence", side=3, line=2)
+dev.off()
+
+#revise figures, supplmentary figures, rewrite methods for RAM.
