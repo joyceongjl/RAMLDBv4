@@ -1170,4 +1170,13 @@ corrplot(pwc.f.coh.new, method="number", type="lower", tl.pos="ld", tl.srt=40, t
 mtext("PWC Fishing Effort Coherence", side=3, line=2)
 dev.off()
 
-#revise figures, supplmentary figures, rewrite methods for RAM.
+#revise figures, supplementary figures, rewrite methods for RAM.
+####new bar plot of percent sig in hotspots
+pcentsignew<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_indpairs_20200729.csv")
+str(pcentsignew)
+psigp3<-ggplot(pcentsignew, aes(x=fao, y=percentsig, fill=dat))
+psigp3 + geom_bar(stat="identity", position="dodge") + theme_bw(base_size = 14) +
+  scale_fill_discrete(name="Data type") + scale_y_continuous(expand = c(0, 0), limits=c(0,45)) +
+  labs(x="FAO region", y="Percentage of significant coherences") + 
+  theme(legend.position = c(.8, .8)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
+ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_indpairs_fdr20_20200729.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
