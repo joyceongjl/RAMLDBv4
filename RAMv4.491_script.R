@@ -1020,10 +1020,11 @@ test2n3<-ioe.tb.50yr.mat.new[2:3,15:43]
 t2n3cd<-cleandat(test2n3, times=1979:2007, clev=5)$cdat
 t2n3coh<-coh(t2n3cd[1,], t2n3cd[2,], times=1979:2007, norm="powall",sigmethod="fast")
 t2n3coh<-bandtest(t2n3coh,tsrange)
-t2n3coh$bandp#pval is 0.010989
+t2n3coh$bandp#pval is 0.021978, mn_phs = -2.100921
 t2n3coh$coher
 t2n3coh$timescales
 mncoh<-Mod(mean(t2n3coh$coher))#0.428 with tsrange 2-10
+mnph<-wsyn:::mnphase(t2n3coh$coher)#value is -2.195, cf mn_phs value from bandp
 
 ##
 tsrange<-c(2,10)#shortest is 29 years, so I guess 10 could work? 
@@ -1046,7 +1047,7 @@ for(ii in 2:nspp){
     coh12<-coh(yy1,yy2,tt,norm="powall",sigmethod="fast")
     coh12<-bandtest(coh12,tsrange)
     pvmat[ii,jj]<-coh12$bandp$p_val
-    cohmat[ii,jj]<-coh12$bandp$mn_coh
+    cohmat[ii,jj]<-Mod(mean(coh12$coher))
     mnphmat[ii,jj]<-coh12$bandp$mn_phs
   }
 }
@@ -1075,3 +1076,23 @@ dev.off()
 
 #New coherence values very different from no NA biomass timeseries. Rerun synmat for ioe.noNA
 #rerun coh code for corrected biomass timeseries in new R window. 
+write.csv(ioe.tb.50yr.mat.new, "D:/Rutgers_postdoc/data/RAM legacy/ioe.tb.50yr.mat.new_20200728.csv")
+
+str(ioe.noNA.cd)
+ioe.tb.noNA.coh2<-synmat(ioe.noNA.cd, times=1970:2007, method="coh", scale.min=2, scale.max=10)
+rownames(ioe.tb.noNA.coh2)<-dimnames(ioe.noNA.cd)[[1]]
+colnames(ioe.tb.noNA.coh2)<-dimnames(ioe.noNA.cd)[[1]]
+ioe.tb.noNA.cohsig2<-synmat(ioe.noNA.cd, times=1970:2007, method="coh.sig.fast", scale.min=2, scale.max=10, nsurrogs=1000)
+ioe.tb.noNA.cohpv2<-1-ioe.tb.noNA.cohsig2
+ioe.tb.noNA.cohqv2<-ioe.tb.noNA.cohpv2
+ioe.tb.noNA.cohqv2[lower.tri(ioe.tb.noNA.cohqv2)]<-p.adjust(ioe.tb.noNA.cohqv2[lower.tri(ioe.tb.noNA.cohqv2)], method="fdr")
+ioe.tb.noNA.cohqv2[1:5,1:5]#check
+ioe.tb.noNA.cohqv2.utri<-ioe.tb.noNA.cohqv2
+ioe.tb.noNA.cohqv2.utri[upper.tri(ioe.tb.noNA.cohqv2.utri)]<-NA
+ioe.tb.noNA.cohqv2.utri<-t(ioe.tb.noNA.cohqv2.utri)
+ioe.tb.noNA.cohqv2[upper.tri(ioe.tb.noNA.cohqv2)]<-ioe.tb.noNA.cohqv2.utri[upper.tri(ioe.tb.noNA.cohqv2.utri)]
+ioe.tb.noNA.cohqv2[1:5,1:5]#check
+length(which(ioe.tb.noNA.cohqv2<0.20))#15 are less than 20% fdr, 53.57%
+length(which(!is.na(ioe.tb.noNA.cohqv2)))#56 not NAs, ie. 28 possible combinations
+
+#perhaps I just need to accept that the coh value is smaller than synmat? Just get the lists for the other regions
