@@ -1162,12 +1162,12 @@ rownames(pwc.f.coh.new)<-gsub("_erdat", "", rownames(pwc.f.coh.new))
 colnames(pwc.f.coh.new)<-rownames(pwc.f.coh.new)
 
 colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
-png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_pwc_allf_fdr20_20200729.png", 
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_allf_fdr20_color_20200730.png", 
     width=1400, height=1300, units="px", res=120)
-corrplot(pwc.f.coh.new, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
-         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=pwc.f.cohqv.new, 
+corrplot(ioe.f.coh.new, method="color", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.f.cohqv.new, 
          sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
-mtext("PWC Fishing Effort Coherence", side=3, line=2)
+#mtext("PWC Fishing Effort Coherence", side=3, line=2)
 dev.off()
 
 #revise figures, supplementary figures, rewrite methods for RAM.
@@ -1180,3 +1180,8 @@ psigp3 + geom_bar(stat="identity", position="dodge") + theme_bw(base_size = 14) 
   labs(x="FAO region", y="Percentage of significant coherences") + 
   theme(legend.position = c(.8, .8)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
 ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_indpairs_fdr20_20200729.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
+
+#number of er_dat and f_dat
+rownames(ane.allf.46yr.mat.new)
+length(grep("_fdat", rownames(ane.allf.46yr.mat.new)))#11 f_dat
+length(grep("_erdat", rownames(ane.allf.46yr.mat.new)))#48 f_dat 
