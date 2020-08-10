@@ -1027,7 +1027,8 @@ mncoh<-Mod(mean(t2n3coh$coher))#0.428 with tsrange 2-10
 mnph<-wsyn:::mnphase(t2n3coh$coher)#value is -2.195, cf mn_phs value from bandp
 
 ##
-tsrange<-c(2,10)#shortest is 29 years, so I guess 10 could work? 
+#tsrange<-c(2,10)#shortest is 29 years, so I guess 10 could work? 
+tsrange=c(0,Inf)# this should be the accurate one
 nspp<-8
 testmat<-ioe.tb.50yr.mat.new
 
@@ -1063,15 +1064,15 @@ ioe.tb.cohqv.new[lower.tri(ioe.tb.cohqv.new)]<-p.adjust(ioe.tb.cohqv.new[lower.t
 ioe.tb.list<-list(ioe.tb.coh.new, ioe.tb.cohpv.new, ioe.tb.cohqv.new, ioe.tb.cohmnph.new)
 
 length(which(!is.na(ioe.tb.cohqv.new)))#28 possible pairwise obs.
-length(which(ioe.tb.cohqv.new<0.20))#10 out of the 28 are sig with fdr<20%, 35.71%
+length(which(ioe.tb.cohqv.new<0.20))#7 out of the 28 are sig with fdr<20%, 25.0%
 
 colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
-png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_tb_color_fdr20_20200729.png", 
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_tb_color_fdr20_20200810.png", 
     width=1400, height=1300, units="px", res=120)
-corrplot(ioe.tb.coh.new, method="number", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+corrplot(ioe.tb.coh.new, method="color", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
          col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.tb.cohqv.new, 
          sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
-mtext("IOE Biomass Coherence", side=3, line=2)
+#mtext("IOE Biomass Coherence", side=3, line=2)
 dev.off()
 
 #New coherence values very different from no NA biomass timeseries. Rerun synmat for ioe.noNA
@@ -1119,9 +1120,10 @@ dimnames(pwc.allf.49yr.mat.new)[[1]]
 str(pwc.allf.49yr.mat.new)#7 stocks from 1967-2015, 49yr ts, shortest overlapping period is 35 years, tsrange = 2-12
 
 ##start function for individual pairwise coh analyses
-tsrange<-c(2,12)
-nspp<-7
-testmat<-pwc.allf.49yr.mat.new
+#tsrange<-c(2,12)
+tsrange=c(0,Inf)# this should be the accurate one
+nspp<-37
+testmat<-ane.tb.53yr.mat
 
 pvmat<-matrix(NA, nspp, nspp)
 cohmat<-matrix(NA, nspp, nspp)
@@ -1144,42 +1146,42 @@ for(ii in 2:nspp){
   }
 }
 
-rownames(pwc.allf.49yr.mat.new)
-rownames(cohmat)<-rownames(pwc.allf.49yr.mat.new)
-colnames(cohmat)<-rownames(pwc.allf.49yr.mat.new)
-pwc.f.coh.new<-cohmat
-pwc.f.cohpv.new<-pvmat
-pwc.f.cohmnph.new<-mnphmat
-pwc.f.cohqv.new<-pwc.f.cohpv.new
-pwc.f.cohqv.new[lower.tri(pwc.f.cohqv.new)]<-p.adjust(pwc.f.cohqv.new[lower.tri(pwc.f.cohqv.new)], method="fdr")
-pwc.f.list<-list(pwc.f.coh.new, pwc.f.cohpv.new, pwc.f.cohqv.new, pwc.f.cohmnph.new)
+rownames(ane.tb.53yr.mat)
+rownames(cohmat)<-rownames(ane.tb.53yr.mat)
+colnames(cohmat)<-rownames(ane.tb.53yr.mat)
+ane.tb.coh.new<-cohmat
+ane.tb.cohpv.new<-pvmat
+ane.tb.cohmnph.new<-mnphmat
+ane.tb.cohqv.new<-ane.tb.cohpv.new
+ane.tb.cohqv.new[lower.tri(ane.tb.cohqv.new)]<-p.adjust(ane.tb.cohqv.new[lower.tri(ane.tb.cohqv.new)], method="fdr")
+ane.tb.list<-list(ane.tb.coh.new, ane.tb.cohpv.new, ane.tb.cohqv.new, ane.tb.cohmnph.new)
 
-length(which(!is.na(pwc.f.cohqv.new)))#21 possible pairwise obs.
-length(which(pwc.f.cohqv.new<0.20))#1 out of the 21 are sig with fdr<20%, 11.11%
+length(which(!is.na(ane.tb.cohqv.new)))#666 possible pairwise obs.
+length(which(ane.tb.cohqv.new<0.20))#59 out of the 666 are sig with fdr<20%, 8.86%
 
-rownames(pwc.f.coh.new)<-gsub("_fdat", "", rownames(pwc.f.coh.new))
-rownames(pwc.f.coh.new)<-gsub("_erdat", "", rownames(pwc.f.coh.new))
-colnames(pwc.f.coh.new)<-rownames(pwc.f.coh.new)
+rownames(ioe.f.coh.new)<-gsub("_fdat", "", rownames(ioe.f.coh.new))
+rownames(ioe.f.coh.new)<-gsub("_erdat", "", rownames(ioe.f.coh.new))
+colnames(ioe.f.coh.new)<-rownames(ioe.f.coh.new)
 
 colbwr<-colorRampPalette(c("blue", "white", "red"))#to specify colour palette
-png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ioe_allf_fdr20_color_20200730.png", 
+png(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/corrplot_RAM_ane_tb_fdr20_color_20200810.png", 
     width=1400, height=1300, units="px", res=120)
-corrplot(ioe.f.coh.new, method="color", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
-         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ioe.f.cohqv.new, 
+corrplot(ane.tb.coh.new, method="color", type="lower", tl.pos="ld", tl.srt=40, tl.offset=0.5, 
+         col=colbwr(10), is.corr=TRUE, diag=F, tl.col="black", p.mat=ane.tb.cohqv.new, 
          sig.level=0.20, insig="blank", cl.ratio=0.1, tl.cex=1)
-#mtext("PWC Fishing Effort Coherence", side=3, line=2)
+#mtext("IOE Fishing Effort Coherence", side=3, line=2)
 dev.off()
 
 #revise figures, supplementary figures, rewrite methods for RAM.
 ####new bar plot of percent sig in hotspots
-pcentsignew<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_indpairs_20200729.csv")
+pcentsignew<-read.csv("D:/Rutgers_postdoc/data/RAM legacy/RAM_v4.491_hotspots_percentsig_indpairs_20200810.csv")
 str(pcentsignew)
 psigp3<-ggplot(pcentsignew, aes(x=fao, y=percentsig, fill=dat))
 psigp3 + geom_bar(stat="identity", position="dodge") + theme_bw(base_size = 14) +
-  scale_fill_discrete(name="Data type") + scale_y_continuous(expand = c(0, 0), limits=c(0,45)) +
+  scale_fill_discrete(name="Data type") + scale_y_continuous(expand = c(0, 0), limits=c(0,35)) +
   labs(x="FAO region", y="Percentage of significant coherences") + 
   theme(legend.position = c(.8, .8)) + geom_text(aes(label=totstocks), position=position_dodge(0.9), vjust=-0.2) 
-ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_indpairs_fdr20_20200729.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
+ggsave(filename="D:/Rutgers_postdoc/Global MS/ecol_applications_journal/Reject_resubmit_reviews/new_fig/bar_RAM_hotspots_indpairs_fdr20_20200810.eps", device="eps", scale=1, width=7, height=4, units="in", dpi=300)
 
 #number of er_dat and f_dat
 rownames(ane.allf.46yr.mat.new)
